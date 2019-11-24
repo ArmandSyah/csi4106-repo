@@ -17,8 +17,8 @@ def plot_confusion_matrix(y_true: np.ndarray, y_pred: np.ndarray, classes: list,
 
     
 # Prints the cross validated scores
-def cross_validate_scores(clf, X: np.ndarray, Y: np.ndarray, cv: int = 3, metrics: list =  ['accuracy']) -> None:
-    scores_raw = cross_validate(clf, X, Y,
+def cross_validate_scores(clf, X: np.ndarray, y: np.ndarray, cv: int = 3, metrics: list =  ['accuracy']) -> None:
+    scores_raw = cross_validate(clf, X, y,
                                 scoring = metrics,
                                 n_jobs = -1,
                                 cv = cv,
@@ -61,51 +61,3 @@ def params_grid_size(params_grid: dict) -> int:
     for _, values in params_grid.items():
             total *= len(values)
     return total
-
-
-# Returns summary data frame from the list of tuplles of grid search results
-def get_grid_search_results(grid_searches: list(tuple()), metrics: list) -> pd.DataFrame:
-    models = []
-    mean_train_scores = defaultdict(list)
-    std_train_scores = defaultdict(list)
-    mean_val_scores = defaultdict(list)
-    std_val_scores = defaultdict(list)
-    
-    for gs in grid_searches:
-        models += [gs[0]]
-        cv_results = gs[1].cv_results_
-        best_index = gs[1].best_index_
-        
-        for metric in metrics:          
-            mean_train_score = cv_results['mean_train_' + metric][best_index]
-            std_train_score = cv_results['std_train_' + metric][best_index]
-            mean_val_score = cv_results['mean_test_' + metric][best_index]
-            std_val_score = cv_results['std_test_' + metric][best_index]
-            
-            mean_train_scores[metric] += [mean_train_score]
-            std_train_scores[metric] += [std_train_score]
-            mean_val_scores[metric] += [mean_val_score]
-            std_val_scores[metric] += [std_val_score]
-            
-    grid_search_results = pd.DataFrame({'Model': models})
-    
-    for metric in metrics:
-        grid_search_results['mean_train_' + metric] = mean_train_scores[metric]
-        grid_search_results['std_train_' + metric] = std_train_scores[metric]
-        grid_search_results['mean_val_' + metric] = mean_val_scores[metric]
-        grid_search_results['std_val_' + metric] = std_val_scores[metric]
-    
-    return grid_search_results
-
-
-# Print best models for each metric
-def best_models(grid_search_results: pd.DataFrame) -> pd.DataFrame:
-    gs = grid_search_results.copy()
-    
-    gs.index = gs['Model']
-    gs = gs[['mean_val_accuracy', 'mean_val_recall', 'mean_val_precision', 'mean_val_f1', 'mean_val_roc_auc']]
-    
-    return pd.DataFrame({
-        'Model': gs.idxmax(axis=0),
-        'Max': gs.max(axis=0)
-    })
