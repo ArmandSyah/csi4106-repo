@@ -125,7 +125,6 @@ dmypy.json
 .pyre/
 
 # Large datasets
-Datasets/animeReviewsOrderbyTime.csv
-Datasets/processedAnimeReviews.csv
+Datasets/*.csv
 
 .vscode/*
