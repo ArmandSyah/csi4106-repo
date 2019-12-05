@@ -2,20 +2,10 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import cross_validate
 from collections import defaultdict
 
-
-# Displays confusion matrix
-def plot_confusion_matrix(y_true: np.ndarray, y_pred: np.ndarray, classes: list, cmap=plt.cm.Blues) -> None:    
-    cm = confusion_matrix(y_true, y_pred)    
-    cm = pd.DataFrame(cm, index = classes, columns = classes)
-    
-    ax = sns.heatmap(cm, cmap = plt.cm.Blues, annot = True)
-    ax.set(xlabel = 'Predicted', ylabel = 'Actual')
-
-    
+   
 # Prints the cross validated scores and returns the mean score across each metric
 def cross_validate_scores(clf, X: np.ndarray, y: np.ndarray, cv: int = 3, metrics: list =  ['accuracy']) -> None:
     scores_raw = cross_validate(clf, X, y,
